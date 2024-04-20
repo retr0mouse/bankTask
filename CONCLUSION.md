@@ -13,7 +13,6 @@ In this conclusion, I evaluate the implementation of TICKET-101, which aimed to 
 - The use of `const` constructors where possible is good for performance and memory usage, especially for widgets that are build frequently. Because when you use const to create an instance of a class, Dart ensures that only a single instance of that object exists in memory and reuses it each time it encounters a const constructor with the same parameters.
 - The use of theme data for consistent styling across the app is a good practice. 
 - The tests cover the main functionalities of the LoanForm widget, such as displaying the form and initial values, and changing the load amount and period with the sliders.
-- The use of find functions to locate widgets in the widget tree is a good practice.
 
 ## Backend
 - The code is DRY (Don't Repeat Yourself!), meaning the code seems to avoid unnecessary repetition.
@@ -24,30 +23,32 @@ In this conclusion, I evaluate the implementation of TICKET-101, which aimed to 
 ### Areas for Improvement:
 
 ## Frontend
+- The checks in the setState function of the _submitForm in the LoanForm are somewhat redundant. The tempAmount and tempPeriod variables are parsed from the result map and then used in a conditional statement. However, regardless of the condition's outcome, the _loanAmountResult and _loanPeriodResult variables are set to the same values (tempAmount and tempPeriod respectively, or _loanAmount and _loanPeriod).
 - The LoanForm widget could benefit from more abstraction. For instance, the sliders for the loan amount and period could be extracted into their own widgets.
-- The NationalIdTextForm widget could be more SOLID by introducing an abstraction for the validation logic. Currently, the validation logic is directly implemented in the widget. This could be refactored into a separate NationalIdValidator class, which would make the code more testable and maintainable.
-- The NationalIdTextForm widget could benefit from more encapsulation. Currently, the validator property is publicly accessible and can be directly modified from outside the class. It would be better to make this property private and provide a public method for setting the validator.
-- The NationalIdTextForm widget could also benefit from dependency inversion. Currently, it directly depends on the TextFormField class. This could be refactored to depend on an abstraction, which would make the code more flexible and easier to test.
 - It would be helpful to describe what each test is doing in the api_service_test file, currently there are no comments explaining the behaviour.
+- In the LoanPeriod slider the lowest value that you can have is 6 months, while the text says '12 months'
+- LoanPeriod slider divisions are not correct should be `48` instead of `40`
+- `inbank-frontend-98f09aabec29a741365f750db29dfe606f20f0b2` folder should be removed from the repository, I believe it was added by accident
+- Bonus: in the LoanForm widget, when we get an error, we could benefit from hiding the results texts, because currently it is too cluttered
 
 ## Backend
 - The DecisionEngine class seems to have multiple responsibilities (validating the personal ID code, calculating the credit modifier, and calculating the loan amount and period). This violates the Single Responsibility Principle (SRP) of SOLID. It would be better to separate these responsibilities into different classes.
 - The DecisionEngineController directly uses the DecisionEngine service. This makes the controller tightly coupled with the service. It would be better to use dependency injection to inject the service into the controller. This would make the code more flexible and easier to test.
+- Credit score calculation is implemented incorrectly. Current implementation: (credit score * loan period) ; Should be: ((credit modifier / loan amount) * loan period).
 
 ## Most Important Shortcoming of TICKET-101:
-- The text under the loan period slider is showing '6 months' a the end of the slider, when in reality it should show '12 months' 
+- Too many requests from the frontend to the backend. Whenever the values of sliders change, we check if the loan is approved with these values. A better approach would be to have an onReleased() to fire the request or even to add a button to submit the values. I chose the latter option and implemented it.
 ### Solution:
 
 # TICKET-102 Implementation Plan
-For TICKET-102, which involves implementing additional functionality for the decision engine, we propose the following plan:
+For TICKET-102, which involves implementing additional functionality for the decision engine, which takes into account customer's age, I propose following plan:
 
 ## Requirements:
-- Implement support for handling different segmentation scenarios based on personal codes.
-- Ensure that the decision engine returns the maximum approved loan amount based on the segmentation and input parameters.
-- Validate input parameters and handle edge cases gracefully.
+- Implementation should not introduce new input fields
+- Ensure that the decision engine returns the maximum approved loan amount as before
+- When the returned decision is negative because of the age of customer, it is clearly pointed out by the error that shows on screen
 
 ## Implementation Steps:
-1. **Analysis and Design**: Review the requirements and design the necessary changes to the decision engine architecture.
-2. **Implementation**: Develop the logic to handle different segmentation scenarios and calculate the maximum approved loan amount accordingly.
-3. **Testing**: Write unit tests to validate the new functionality and perform integration testing to ensure seamless integration with the existing codebase.
-4. **Documentation**: Document the implemented changes, including any architectural decisions and usage instructions for future reference.
+1. **Analysis and Design**: I evaluate the current implementation of the decision engine and exceptions to add the functionality in compliance with everything
+2. **Implementation**: Add a function to get the age of the user, add exception to throw when the age is not approved and the condition in which this error will be thrown
+3. **Testing**: Write additional tests to check the correctness of the added functionality 
