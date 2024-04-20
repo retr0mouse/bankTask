@@ -5,6 +5,7 @@ In this conclusion, I evaluate the implementation of TICKET-101, which aimed to 
 
 ### What was done well:
 - The intern successfully created the loan form in Flutter framework on the backend and the decision engine in Spring Boot on the backend.
+- The code works according to the requirements.
 
 ## Frontend
 - The implementation is well-documented, it is easy to understand what the code does only by reading the comments and names of the functions and parameters.
@@ -23,9 +24,10 @@ In this conclusion, I evaluate the implementation of TICKET-101, which aimed to 
 ### Areas for Improvement:
 
 ## Frontend
-- The LoanForm widget is currently responsible for managing the form state, building the form UI, validating the form, and submitting the form to the API service. This could make the widget difficult to test, maintain, and reuse. Refactoring this widget to separate these concerns would greatly improve the code quality. Also, because of that this widget is not very open to extension without modification. If we want to change the validation logic or the way we handle API responses, we would need to modify the class directly. It could potentially be reused in other parts of the app, but it's tightly coupled to the ApiService and specific form fields, which limits its reusability.
-- The tests could be made more robust by adding more assertions. For example, you could check that the sliders are initially at the correct positions, or that the form displays an error message when the input is invalid.
-- The tests could be made more readable by extracting common setup code (like creating the LoanForm widget) into a setup function.
+- The LoanForm widget could benefit from more abstraction. For instance, the sliders for the loan amount and period could be extracted into their own widgets.
+- The NationalIdTextForm widget could be more SOLID by introducing an abstraction for the validation logic. Currently, the validation logic is directly implemented in the widget. This could be refactored into a separate NationalIdValidator class, which would make the code more testable and maintainable.
+- The NationalIdTextForm widget could benefit from more encapsulation. Currently, the validator property is publicly accessible and can be directly modified from outside the class. It would be better to make this property private and provide a public method for setting the validator.
+- The NationalIdTextForm widget could also benefit from dependency inversion. Currently, it directly depends on the TextFormField class. This could be refactored to depend on an abstraction, which would make the code more flexible and easier to test.
 - It would be helpful to describe what each test is doing in the api_service_test file, currently there are no comments explaining the behaviour.
 
 ## Backend
@@ -33,7 +35,7 @@ In this conclusion, I evaluate the implementation of TICKET-101, which aimed to 
 - The DecisionEngineController directly uses the DecisionEngine service. This makes the controller tightly coupled with the service. It would be better to use dependency injection to inject the service into the controller. This would make the code more flexible and easier to test.
 
 ## Most Important Shortcoming of TICKET-101:
-
+- The text under the loan period slider is showing '6 months' a the end of the slider, when in reality it should show '12 months' 
 ### Solution:
 
 # TICKET-102 Implementation Plan
@@ -49,5 +51,3 @@ For TICKET-102, which involves implementing additional functionality for the dec
 2. **Implementation**: Develop the logic to handle different segmentation scenarios and calculate the maximum approved loan amount accordingly.
 3. **Testing**: Write unit tests to validate the new functionality and perform integration testing to ensure seamless integration with the existing codebase.
 4. **Documentation**: Document the implemented changes, including any architectural decisions and usage instructions for future reference.
-
-By following this plan, we aim to deliver a robust and scalable solution that meets the requirements of TICKET-102 and enhances the functionality of the decision engine.
