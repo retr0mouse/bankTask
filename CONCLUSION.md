@@ -34,7 +34,7 @@ In this conclusion, I evaluate the implementation of TICKET-101, which aimed to 
 - Decision engine does not return the maximum possible loan sum, instead it calculates the sum that is equal or less than requested.
 
 ## Most Important Shortcomings of TICKET-101:
-- Too many requests from the frontend to the backend. Whenever the values of sliders change, we check if the loan is approved with these values. A better approach would be to have an onReleased() to fire the request or even to add a button to submit the values. (fixed)
+- Too many requests from the frontend to the backend. Whenever the values of sliders change, we check if the loan is approved with these values. A better approach would be to have an onChangeEnd() to fire the request or even to add a button to submit the values. (fixed)
 - The implementation of the decision engine on the backend was not implemented correctly, meaning it does not use credit score to decide whether we can approve the request for loan or not. (fixed)
 ### Solution:
 - Implemented a solution for making much less request from the frontend to the backend. Created a button to send api request, refactored tests accordingly.
