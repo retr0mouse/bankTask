@@ -23,29 +23,31 @@ In this conclusion, I evaluate the implementation of TICKET-101, which aimed to 
 ### Areas for Improvement:
 
 ## Frontend
-- The checks in the setState function of the _submitForm in the LoanForm are somewhat redundant. The tempAmount and tempPeriod variables are parsed from the result map and then used in a conditional statement. However, regardless of the condition's outcome, the _loanAmountResult and _loanPeriodResult variables are set to the same values (tempAmount and tempPeriod respectively, or _loanAmount and _loanPeriod).
-- The LoanForm widget could benefit from more abstraction. For instance, the sliders for the loan amount and period could be extracted into their own widgets.
-- It would be helpful to describe what each test is doing in the api_service_test file, currently there are no comments explaining the behaviour.
-- In the LoanPeriod slider the lowest value that you can have is 6 months, while the text says '12 months'
-- LoanPeriod slider divisions are not correct should be `48` instead of `40`
-- `inbank-frontend-98f09aabec29a741365f750db29dfe606f20f0b2` folder should be removed from the repository, I believe it was added by accident
-- Bonus: in the LoanForm widget, when we get an error, we could benefit from hiding the results texts, because currently it is too cluttered
+- The checks in the setState function of the _submitForm in the LoanForm are somewhat redundant. The tempAmount and tempPeriod variables are parsed from the result map and then used in a conditional statement. However, regardless of the condition's outcome, the _loanAmountResult and _loanPeriodResult variables are set to the same values (tempAmount and tempPeriod respectively, or _loanAmount and _loanPeriod). (fixed)
+- The LoanForm widget could benefit from more abstraction. For instance, the sliders for the loan amount and period could be extracted into their own widgets. (fixed)
+- It would be helpful to describe what each test is doing in the api_service_test file, currently there are no comments explaining the behaviour. (fixed)
+- In the LoanPeriod slider the lowest value that you can have is 6 months, while the text says '12 months'. (fixed)
+- LoanPeriod slider divisions are not correct should be `48` instead of `40`. (fixed)
+- `inbank-frontend-98f09aabec29a741365f750db29dfe606f20f0b2` folder should be removed from the repository, I believe it was added by accident. (fixed)
+- Bonus: in the LoanForm widget, when we get an error, we could benefit from hiding the results texts, because currently it is too cluttered. (fixed)
 
 ## Backend
-- The DecisionEngine class seems to have multiple responsibilities (validating the personal ID code, calculating the credit modifier, and calculating the loan amount and period). This violates the Single Responsibility Principle (SRP) of SOLID. It would be better to separate these responsibilities into different classes.
-- The DecisionEngineController directly uses the DecisionEngine service. This makes the controller tightly coupled with the service. It would be better to use dependency injection to inject the service into the controller. This would make the code more flexible and easier to test.
-- Credit score calculation is implemented incorrectly. Current implementation: (credit score * loan period) ; Should be: ((credit modifier / loan amount) * loan period).
+- The DecisionEngine class seems to have multiple responsibilities (validating the personal ID code, calculating the credit modifier, and calculating the loan amount and period). This violates the Single Responsibility Principle (SRP) of SOLID. It would be better to separate these responsibilities into different classes if we plan to add additional checks or to test the application more thoroughly.
+- Decision engine does not return the maximum possible loan sum, instead it calculates the sum that is equal or less than requested.
 
-## Most Important Shortcoming of TICKET-101:
-- Too many requests from the frontend to the backend. Whenever the values of sliders change, we check if the loan is approved with these values. A better approach would be to have an onReleased() to fire the request or even to add a button to submit the values. I chose the latter option and implemented it.
+## Most Important Shortcomings of TICKET-101:
+- Too many requests from the frontend to the backend. Whenever the values of sliders change, we check if the loan is approved with these values. A better approach would be to have an onReleased() to fire the request or even to add a button to submit the values. (fixed)
+- The implementation of the decision engine on the backend was not implemented correctly, meaning it does not use credit score to decide whether we can approve the request for loan or not. (fixed)
 ### Solution:
+- Implemented a solution for making much less request from the frontend to the backend. Created a button to send requests, refactored tests accordingly.
+- Refactored the decision engine to use credit score to determine the validity of the loan request. 
 
 # TICKET-102 Implementation Plan
 For TICKET-102, which involves implementing additional functionality for the decision engine, which takes into account customer's age, I propose following plan:
 
 ## Requirements:
 - Implementation should not introduce new input fields
-- Ensure that the decision engine returns the maximum approved loan amount as before
+- Decision engine should work
 - When the returned decision is negative because of the age of customer, it is clearly pointed out by the error that shows on screen
 
 ## Implementation Steps:
